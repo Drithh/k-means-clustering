@@ -1,6 +1,5 @@
 import random
 import matplotlib.pyplot as plt
-from sklearn.cluster import KMeans as KMeansSklearn
 
 
 def euclidean_distance(point_1: list, point_2: list) -> float:
@@ -56,28 +55,21 @@ class KMeans:
 
 
 def generate_random_data(n=100, k=2, min=0, max=100) -> list:
-    data = []
-    for _ in range(n):
-        data.append([random.randint(min, max) for _ in range(k)])
-    return data
+    return [[random.randint(min, max) for _ in range(k)] for _ in range(n)]
 
 
 def plot_2d(data: list, centroids: list):
-    colors = ['r', 'y', 'b']
+    colors = ['r', 'y', 'b', 'c', 'k', 'g', 'm']
     for i, centroid in enumerate(centroids):
+        plt.scatter([x[0] for x in data[i]], [x[1]
+                                              for x in data[i]], c=colors[i])
         plt.scatter(centroid[0], centroid[1], c='black', marker='x')
-        for point in data[i]:
-            plt.scatter(point[0], point[1], c=colors[i])
-
-    # plt.scatter([x[0] for x in data], [x[1] for x in data], c=y_means)
-    # plt.scatter([x[0] for x in centroids], [x[1]
-    #             for x in centroids], c='black', marker='x')
 
     plt.show()
 
 
 def plot_3d(clusters: list, centroids: list):
-    colors = ['r', 'y', 'b']
+    colors = ['r', 'y', 'b', 'c', 'k', 'g', 'm']
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
     for i, cluster in enumerate(clusters):
@@ -86,12 +78,11 @@ def plot_3d(clusters: list, centroids: list):
         ax.scatter(centroids[i][0], centroids[i][1],
                    centroids[i][2], c='black', marker='x')
     plt.show()
-
-
 if __name__ == "__main__":
-    data = generate_random_data(n=100, k=2, min=0, max=100)
-
+    data = generate_random_data(n=50, k=3)
     kmeans = KMeans(data, n_clusters=3)
     kmeans.fit()
+    plot_3d(kmeans.clusters, kmeans.centroids)
 
-    plot_2d(kmeans.clusters, kmeans.centroids)
+    # plot_3d(kmeans.clusters, kmeans.centroids)
+    # plot_2d(kmeans.clusters, kmeans.centroids)
