@@ -15,13 +15,16 @@ def mean(points: list) -> list:
 
 
 class KMeans:
-    def __init__(self, data: list, n_clusters=2, max_iteration=300):
+    def __init__(self, data: list, n_clusters=2, max_iteration=300, n_init=10):
         self.n_clusters = n_clusters
         self.data = data
         self.max_iteration = max_iteration
-        self.centroids = self.fit()
+        self.centroids = []
+        self.clusters = []
+        self.inertia = None
+        self.n_init = n_init
 
-    def fit(self) -> list:
+    def kmeans(self):
         centroids = random.sample(self.data, self.n_clusters)
         for _ in range(self.max_iteration):
             clusters = [[] for _ in range(self.n_clusters)]
@@ -32,9 +35,19 @@ class KMeans:
             for cluster in clusters:
                 new_centroids.append(mean(cluster))
             if new_centroids == centroids:
-                self.clusters = clusters
                 break
             centroids = new_centroids
+        return centroids, clusters
+
+    def fit(self):
+        for _ in range(self.n_init):
+            centroids, clusters = self.kmeans()
+            current_inertia = sum([sum([euclidean_distance(x, centroid) for x in cluster])
+                                  for centroid, cluster in zip(centroids, clusters)])
+            if self.inertia is None or current_inertia < self.inertia:
+                self.inertia = current_inertia
+                self.centroids = centroids
+                self.clusters = clusters
 
 
 def generate_random_data(n=100, k=2, min=0, max=100) -> list:
@@ -47,9 +60,11 @@ def generate_random_data(n=100, k=2, min=0, max=100) -> list:
 if __name__ == "__main__":
     data = [[1, 2], [1, 4], [1, 0], [10, 2], [10, 4], [10, 0]]
     # print(data)
-    kmeans = KMeans(data, n_clusters=2)
     lib_kmeans = KMeansSklearn(n_clusters=2)
     lib_kmeans.fit(data)
-    print(lib_kmeans.cluster_centers_)
-    print(kmeans.centroids)
+    # print(lib_kmeans.cluster_centers_)
+    for i in range(10):
+        kmeans = KMeans(data, n_clusters=2)
+        kmeans.fit()
+        print(kmeans.centroids)
     # print(kmeans.clusters)
