@@ -1,5 +1,6 @@
-from sklearn.cluster import KMeans as KMeansSklearn
 import random
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans as KMeansSklearn
 
 
 def euclidean_distance(point_1: list, point_2: list) -> float:
@@ -19,10 +20,11 @@ class KMeans:
         self.n_clusters = n_clusters
         self.data = data
         self.max_iteration = max_iteration
+        self.n_init = n_init
+
         self.centroids = []
         self.clusters = []
         self.inertia = None
-        self.n_init = n_init
 
     def kmeans(self):
         centroids = random.sample(self.data, self.n_clusters)
@@ -42,8 +44,11 @@ class KMeans:
     def fit(self):
         for _ in range(self.n_init):
             centroids, clusters = self.kmeans()
-            current_inertia = sum([sum([euclidean_distance(x, centroid) for x in cluster])
-                                  for centroid, cluster in zip(centroids, clusters)])
+
+            current_inertia = 0
+            for centroid, cluster in zip(centroids, clusters):
+                for point in cluster:
+                    current_inertia += euclidean_distance(point, centroid) ** 2
             if self.inertia is None or current_inertia < self.inertia:
                 self.inertia = current_inertia
                 self.centroids = centroids
@@ -57,14 +62,36 @@ def generate_random_data(n=100, k=2, min=0, max=100) -> list:
     return data
 
 
+def plot_2d(data: list, centroids: list):
+    colors = ['r', 'y', 'b']
+    for i, centroid in enumerate(centroids):
+        plt.scatter(centroid[0], centroid[1], c='black', marker='x')
+        for point in data[i]:
+            plt.scatter(point[0], point[1], c=colors[i])
+
+    # plt.scatter([x[0] for x in data], [x[1] for x in data], c=y_means)
+    # plt.scatter([x[0] for x in centroids], [x[1]
+    #             for x in centroids], c='black', marker='x')
+
+    plt.show()
+
+
+def plot_3d(clusters: list, centroids: list):
+    colors = ['r', 'y', 'b']
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    for i, cluster in enumerate(clusters):
+        ax.scatter([x[0] for x in cluster], [x[1]
+                                             for x in cluster], [x[2] for x in cluster], c=colors[i])
+        ax.scatter(centroids[i][0], centroids[i][1],
+                   centroids[i][2], c='black', marker='x')
+    plt.show()
+
+
 if __name__ == "__main__":
-    data = [[1, 2], [1, 4], [1, 0], [10, 2], [10, 4], [10, 0]]
-    # print(data)
-    lib_kmeans = KMeansSklearn(n_clusters=2)
-    lib_kmeans.fit(data)
-    # print(lib_kmeans.cluster_centers_)
-    for i in range(10):
-        kmeans = KMeans(data, n_clusters=2)
-        kmeans.fit()
-        print(kmeans.centroids)
-    # print(kmeans.clusters)
+    data = generate_random_data(n=100, k=2, min=0, max=100)
+
+    kmeans = KMeans(data, n_clusters=3)
+    kmeans.fit()
+
+    plot_2d(kmeans.clusters, kmeans.centroids)
