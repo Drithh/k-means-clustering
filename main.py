@@ -78,11 +78,13 @@ def plot_3d(clusters: list, centroids: list):
         ax.scatter(centroids[i][0], centroids[i][1],
                    centroids[i][2], c='black', marker='x')
     plt.show()
+
+
 if __name__ == "__main__":
-    data = generate_random_data(n=50, k=3)
+    data = generate_random_data(n=50, k=2)
     kmeans = KMeans(data, n_clusters=3)
     kmeans.fit()
-    plot_3d(kmeans.clusters, kmeans.centroids)
+    # plot_3d(kmeans.clusters, kmeans.centroids)
 
     # plot_3d(kmeans.clusters, kmeans.centroids)
-    # plot_2d(kmeans.clusters, kmeans.centroids)
+    plot_2d(kmeans.clusters, kmeans.centroids)
