@@ -1,11 +1,11 @@
 channels:
   - conda-forge
 dependencies:
-  - python
+  - python=3.10
   - numpy
   - matplotlib
   - pandas
   - bokeh
   - rise
   - pip:
-    - jupyter-contrib-nbextensions
+      - jupyter-contrib-nbextensions
