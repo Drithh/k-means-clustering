@@ -1,5 +1,7 @@
+import csv
 import random
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
+# import sklearn.
 
 
 def euclidean_distance(point_1: list, point_2: list) -> float:
@@ -41,9 +43,11 @@ class KMeans:
         return centroids, clusters
 
     def fit(self):
-        for _ in range(self.n_init):
-            centroids, clusters = self.kmeans()
+        print()
+        print()
 
+        for i in range(self.n_init):
+            centroids, clusters = self.kmeans()
             current_inertia = 0
             for centroid, cluster in zip(centroids, clusters):
                 for point in cluster:
@@ -58,33 +62,81 @@ def generate_random_data(n=100, k=2, min=0, max=100) -> list:
     return [[random.randint(min, max) for _ in range(k)] for _ in range(n)]
 
 
-def plot_2d(data: list, centroids: list):
-    colors = ['r', 'y', 'b', 'c', 'k', 'g', 'm']
-    for i, centroid in enumerate(centroids):
-        plt.scatter([x[0] for x in data[i]], [x[1]
-                                              for x in data[i]], c=colors[i])
-        plt.scatter(centroid[0], centroid[1], c='black', marker='x')
+# def plot_2d(data: list, centroids: list):
+#     colors = ['r', 'y', 'b', 'c', 'k', 'g', 'm']
+#     for i, centroid in enumerate(centroids):
+#         plt.scatter([x[0] for x in data[i]], [x[1]
+#                                               for x in data[i]], c=colors[i])
+#         plt.scatter(centroid[0], centroid[1], c='black', marker='x')
 
-    plt.show()
+#     plt.show()
 
 
-def plot_3d(clusters: list, centroids: list):
-    colors = ['r', 'y', 'b', 'c', 'k', 'g', 'm']
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    for i, cluster in enumerate(clusters):
-        ax.scatter([x[0] for x in cluster], [x[1]
-                                             for x in cluster], [x[2] for x in cluster], c=colors[i])
-        ax.scatter(centroids[i][0], centroids[i][1],
-                   centroids[i][2], c='black', marker='x')
-    plt.show()
+# def plot_3d(clusters: list, centroids: list):
+#     colors = ['r', 'y', 'b', 'c', 'k', 'g', 'm']
+#     fig = plt.figure()
+#     ax = fig.add_subplot(111, projection='3d')
+#     for i, cluster in enumerate(clusters):
+#         ax.scatter([x[0] for x in cluster], [x[1]
+#                                              for x in cluster], [x[2] for x in cluster], c=colors[i])
+#         ax.scatter(centroids[i][0], centroids[i][1],
+#                    centroids[i][2], c='black', marker='x')
+#     plt.show()
 
 
 if __name__ == "__main__":
-    data = generate_random_data(n=50, k=2)
-    kmeans = KMeans(data, n_clusters=3)
-    kmeans.fit()
-    # plot_3d(kmeans.clusters, kmeans.centroids)
+    data = []
+    with open('data.csv', 'r') as f:
+        reader = csv.reader(f, delimiter=',')
+        for row in reader:
+            data.append([float(x) for x in row])
 
-    # plot_3d(kmeans.clusters, kmeans.centroids)
-    plot_2d(kmeans.clusters, kmeans.centroids)
+    kmeans = KMeans(data, n_clusters=4, n_init=100)
+    kmeans.fit()
+    for centroid, cluster in zip(kmeans.centroids, kmeans.clusters):
+        print(f"Centroid: {centroid}")
+        for i, point in enumerate(cluster):
+            if i < 1:
+                print(f"Cluster:  {point}")
+            else:
+                print(f"\t  {point}")
+        print()
+
+    # without inertia
+    for i in range(8):
+        kmeans = KMeans(data, n_clusters=4)
+        centroids, clusters = kmeans.kmeans()
+        print(f"iterasi {i+1}: ", end="")
+        for i, centroid in enumerate(centroids):
+            # print truncating floating point
+            str_data = [f"{x:.2f}" for x in centroid]
+            new_data = ""
+            min_string_length = 7
+            for x in str_data:
+                new_data += x + " " * (min_string_length - len(x))
+            if i < 1:
+                print(f"centroid {i+1}: {new_data}")
+            else:
+                print(f"{'':11}centroid {i+1}: {new_data}")
+        print()
+
+    # with inertia
+    for i in range(8):
+        kmeans = KMeans(data, n_clusters=4, n_init=100)
+        kmeans.fit()
+        centroids = sorted(kmeans.centroids)
+        print(f"iterasi {i+1}: ", end="")
+        for i, centroid in enumerate(centroids):
+            # print truncating floating point
+            str_data = [f"{x:.2f}" for x in centroid]
+            new_data = ""
+            min_string_length = 7
+            for x in str_data:
+                new_data += x + " " * (min_string_length - len(x))
+            if i < 1:
+                print(f"centroid {i+1}: {new_data}")
+            else:
+                print(f"{'':11}centroid {i+1}: {new_data}")
+        print()
+    # print()
+    # print()
